@@ -1,0 +1,20 @@
+.mainColor {
+  background-color: #d9d9d9;
+  transition: ease-in-out;
+}
+
+.mainColor:hover {
+  transform: scale(1.02);
+  cursor: pointer;
+}
+
+.buttonColor {
+  background-color: #ff6b35;
+  border: none;
+  transition: ease-in-out;
+}
+
+.buttonColor:hover {
+  background-color: #ff6b35;
+  transform: scale(1.1);
+}

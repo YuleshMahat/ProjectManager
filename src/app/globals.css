@@ -2,5 +2,13 @@ html,
 body {
   box-sizing: border-box;
   margin: 0;
-  padding: 0;
+  padding: 1rem 3rem;
+}
+html {
+  min-height: 100vh;
+}
+
+.mainTheme {
+  background-color: #1e2a38;
+  color: white !important;
 }

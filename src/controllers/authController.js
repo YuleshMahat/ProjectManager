@@ -7,7 +7,6 @@ import { encodeFunction, decodeFunction } from "@/lib/utils/passwordEncrypt";
 
 export async function registerUser(req) {
   try {
-    await mongooseConnect();
     const data = await parseJSON(req);
     const { password, ...rest } = data;
 
@@ -29,9 +28,11 @@ export async function registerUser(req) {
 
 export async function loginUser(req) {
   try {
+    await mongooseConnect();
     const { email, password } = await parseJSON(req);
     const result = await findByFilter({ email });
 
+    console.log(email, password);
     if (!result) {
       return NextResponse.json(
         { status: "error", message: "Invalid credentials" },

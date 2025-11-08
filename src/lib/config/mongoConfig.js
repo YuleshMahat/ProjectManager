@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import config from "@/lib/config/config";
 
 export const mongooseConnect = async () => {
+  console.log("connection state of mongoose", mongoose.connection.readyState);
   if (mongoose.connection.readyState >= 1) return;
 
   try {
