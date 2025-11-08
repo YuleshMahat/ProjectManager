@@ -33,14 +33,14 @@ const CustomCard = ({
       <Card.Body className="mainTheme">
         <Card.Title>{title}</Card.Title>
         <Card.Text>{information}</Card.Text>
-        <Button
-          className={style.buttonColor}
+        <button
+          className={`btn ${style.buttonColor}`}
           onClick={() => {
-            router.push("/mainInfo");
+            router.push(navigation);
           }}
         >
           {buttonText}
-        </Button>
+        </button>
       </Card.Body>
     </Card>
   );
