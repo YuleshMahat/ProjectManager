@@ -45,7 +45,7 @@ const page = () => {
           title="Manage personal info"
           image="/personalInfo.png"
           information="Manage the personal information showed on your portfolio"
-          navigation=""
+          navigation="/personalInfo"
         />
       </div>
     </div>

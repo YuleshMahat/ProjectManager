@@ -1,6 +1,6 @@
 import { toast } from "react-toastify";
 import { fetchCustomerDetailApi, loginApi } from "./authApi";
-import { setUser } from "./authSlice";
+import { logout, setUser } from "./authSlice";
 import {
   storeAccessToken,
   storeRefreshToken,
@@ -38,4 +38,8 @@ export const getCustomerDetail = () => async (dispatch) => {
   } catch (err) {
     console.error(err);
   }
+};
+
+export const handleLogout = () => (dispatch) => {
+  dispatch(logout());
 };

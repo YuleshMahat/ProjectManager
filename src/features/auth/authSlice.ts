@@ -1,3 +1,4 @@
+// features/auth/userSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface User {
@@ -22,12 +23,18 @@ const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    setUser: (state, actions: PayloadAction<User>) => {
-      state.user = actions.payload;
+    setUser: (state, action: PayloadAction<User>) => {
+      state.user = action.payload;
+    },
+    logout: (state) => {
+      state.user = null;
+      // Clear everything
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+      sessionStorage.clear();
     },
   },
 });
-const { reducer, actions } = userSlice;
 
-export const { setUser } = actions;
-export default reducer;
+export const { setUser, logout } = userSlice.actions;
+export default userSlice.reducer;

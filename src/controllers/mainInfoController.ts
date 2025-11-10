@@ -1,3 +1,4 @@
+import { mongooseConnect } from "@/lib/config/mongoConfig";
 import { parseJSON } from "@/lib/utils/parseJson";
 import {
   createNew,
@@ -13,7 +14,7 @@ export const updateInfo = async (req: Request) => {
 
   try {
     let result = {};
-    if (infoId === "") {
+    if (infoId === "" || !infoId) {
       result = await createNew(updateObj);
     } else {
       console.log(1212121212, updateObj);
@@ -37,6 +38,7 @@ export const updateInfo = async (req: Request) => {
 
 export const getMainInfo = async (id: string) => {
   try {
+    await mongooseConnect();
     const result = await findByFilter({ userId: id });
 
     return NextResponse.json(

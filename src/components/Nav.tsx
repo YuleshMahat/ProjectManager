@@ -1,35 +1,71 @@
+// components/Nav.tsx
 "use client";
 
-import { useAppSelector } from "@/hooks/reduxHooks";
-import { useRouter } from "next/navigation";
 import React from "react";
+import { useRouter } from "next/navigation";
+import { useAppSelector, useAppDispatch } from "@/hooks/reduxHooks";
+import { LogOut, User, Home } from "lucide-react";
+import { toast } from "react-toastify";
+import { handleLogout } from "@/features/auth/authAction";
 
 const Nav = () => {
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.userStore);
 
+  const onLogout = () => {
+    dispatch(handleLogout());
+    toast.success("See ya, legend! You're logged out.");
+  };
+
+  const goHome = () => {
+    router.push("/dashboard");
+  };
+
   return (
-    <div className="W-100 d-flex justify-content-between fs-4">
-      <div
-        className="d-flex gap-3"
-        onClick={() => {
-          router.push("/dashboard");
-        }}
-        style={{ cursor: "pointer" }}
-      >
-        <img
-          src="/logo.png"
-          alt="logo"
-          width="50px"
-          style={{ borderRadius: "50%", cursor: "pointer" }}
-        />
-        <span>PortfolioManager</span>
+    <nav className="bg-white shadow-lg border-bottom border-2 border-primary-subtle px-4 py-3">
+      <div className="container-fluid d-flex justify-content-between align-items-center">
+        {/* Logo + Brand */}
+        <div
+          className="d-flex align-items-center gap-3"
+          onClick={goHome}
+          style={{ cursor: "pointer" }}
+        >
+          <img
+            src="/logo.png"
+            alt="PortfolioManager Logo"
+            width={50}
+            height={50}
+            className="rounded-circle shadow-sm"
+          />
+          <span className="fw-bold fs-3 text-primary">PortfolioManager</span>
+        </div>
+
+        {/* User Info + Logout */}
+        <div className="d-flex align-items-center gap-4">
+          {/* User Greeting */}
+          <div className="d-flex align-items-center gap-2 text-muted">
+            <User size={20} className="text-primary" />
+            <span className="fw-semibold">
+              {user?.fname ? `Hey, ${user.fname}!` : "Guest"}
+            </span>
+          </div>
+
+          {/* Logout Button */}
+          <button
+            onClick={onLogout}
+            className="btn btn-outline-danger d-flex align-items-center gap-2 px-4 py-2 rounded-pill shadow-sm transition-all hover-shadow-lg"
+            style={{
+              fontWeight: "600",
+              borderWidth: "2px",
+            }}
+          >
+            <LogOut size={18} />
+            Logout
+          </button>
+        </div>
       </div>
-      <ul className="d-flex gap-2" style={{ listStyleType: "none" }}>
-        <li>{user?.fname}</li>
-        <li>Logout</li>
-      </ul>
-    </div>
+    </nav>
   );
 };
 

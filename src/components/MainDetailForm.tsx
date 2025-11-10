@@ -17,6 +17,7 @@ const MainDetailForm = () => {
   };
 
   const { form, setForm, handleChange } = useForm<FormValues>({
+    userId: user?._id || "",
     primaryInfo: "",
     secondaryInfo: "",
   });
@@ -24,6 +25,7 @@ const MainDetailForm = () => {
     const getInfo = async () => {
       const result = await getMainInfoAction(user._id);
       setForm({
+        userId: user._id,
         primaryInfo: result.result?.primaryInfo || "",
         secondaryInfo: result.result?.secondaryInfo || "",
         infoId: result.result?._id,
@@ -33,6 +35,7 @@ const MainDetailForm = () => {
   }, []);
 
   interface FormValues {
+    userId: string;
     primaryInfo: string;
     secondaryInfo: string;
     infoId?: string;
