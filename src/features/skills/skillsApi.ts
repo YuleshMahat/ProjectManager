@@ -14,3 +14,14 @@ export const deleteSkillApi = (userId: string, skills: string[]) => {
     data: { userId, skills }, // body for DELETE request
   });
 };
+
+export const addSkillApi = (userId: string, skill: string) => {
+  return apiProcessor({
+    method: "patch",
+    url: `${apiUrl}/skills`,
+    data: {
+      userId,
+      skills: [skill], // backend expects array even for single add
+    },
+  });
+};

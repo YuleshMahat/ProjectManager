@@ -1,10 +1,13 @@
 "use client";
 
+import { useAppSelector } from "@/hooks/reduxHooks";
 import { useRouter } from "next/navigation";
 import React from "react";
 
 const Nav = () => {
   const router = useRouter();
+  const { user } = useAppSelector((state) => state.userStore);
+
   return (
     <div className="W-100 d-flex justify-content-between fs-4">
       <div
@@ -23,8 +26,8 @@ const Nav = () => {
         <span>PortfolioManager</span>
       </div>
       <ul className="d-flex gap-2" style={{ listStyleType: "none" }}>
-        <li>Login</li>
-        <li>Get Started</li>
+        <li>{user?.fname}</li>
+        <li>Logout</li>
       </ul>
     </div>
   );

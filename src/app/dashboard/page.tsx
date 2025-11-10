@@ -39,7 +39,7 @@ const page = () => {
           title="Manage projects"
           image="/projects.png"
           information="Manage the projects showcased on your portfolio"
-          navigation=""
+          navigation="/projects"
         />
         <CustomCard
           title="Manage personal info"

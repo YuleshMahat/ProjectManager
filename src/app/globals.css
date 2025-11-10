@@ -9,3 +9,9 @@ body {
   background-color: #1e2a38;
   color: white !important;
 }
+
+.text-glow {
+  color: white !important;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  font-weight: 500;
+}

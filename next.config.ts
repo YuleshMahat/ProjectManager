@@ -1,7 +1,25 @@
-import type { NextConfig } from "next";
+// next.config.js
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  // THIS IS THE MAGIC LINE ↓↓↓
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**", // ← double asterisk = allow EVERY domain
+      },
+      {
+        protocol: "http",
+        hostname: "**", // also allow http (for local dev / some old sites)
+      },
+    ],
+  },
 
-const nextConfig: NextConfig = {
-  /* config options here */
+  // Optional: if you use TypeScript path aliases, keep them
+  webpack(config) {
+    config.resolve.alias["@"] = __dirname + "/src";
+    return config;
+  },
 };
 
-export default nextConfig;
+module.exports = nextConfig;

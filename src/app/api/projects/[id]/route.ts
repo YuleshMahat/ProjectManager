@@ -1,8 +1,9 @@
-import { getMainInfo } from "@/controllers/mainInfoController";
+import { getProjects } from "@/controllers/projectsController";
+
 export async function GET(
   req: Request,
   context: { params: Promise<{ id: string }> }
 ) {
   const { id } = await context.params;
-  return getMainInfo(id);
+  return getProjects(id);
 }

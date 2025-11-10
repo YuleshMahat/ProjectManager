@@ -8,6 +8,7 @@ import { createAccessToken, createRefreshToken } from "@/lib/utils/jwt";
 
 export async function registerUser(req) {
   try {
+    await mongooseConnect();
     const data = await parseJSON(req);
     const { password, ...rest } = data;
 

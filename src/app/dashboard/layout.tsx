@@ -6,12 +6,10 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import { getCustomerDetail } from "@/features/auth/authAction";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
   const { user } = useAppSelector((state) => state.userStore);
-  const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (!user?._id) {
