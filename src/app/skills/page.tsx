@@ -16,7 +16,7 @@ const Page = () => {
   const [skills, setSkills] = useState<string[]>([]);
   const [showModal, setShowModal] = useState(false);
   const { user } = useAppSelector((state) => state.userStore);
-  const userId = user._id;
+  const userId = user?._id;
 
   const handleAddSkill = async (skill: string) => {
     const result = await updateSkillsAction(userId, [...skills, skill]);
