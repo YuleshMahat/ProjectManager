@@ -42,8 +42,8 @@ const LoginForm = () => {
           background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
         }}
       >
-        <h2 className="fw-bold mb-2">Welcome Back, Legend</h2>
-        <p className="opacity-90">Log in to crush your portfolio</p>
+        <h2 className="fw-bold mb-2">Hello!</h2>
+        <p className="opacity-90">Login to start managing your portfolio</p>
       </div>
 
       <Card.Body className="p-5">

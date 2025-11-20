@@ -7,21 +7,22 @@ interface apiProcessorParams {
   method: "get" | "post" | "put" | "delete" | "patch";
   url: string;
   data?: any;
+  isPrivate?: boolean;
 }
 
 export const apiProcessor = async ({
   method,
   url,
   data,
+  isPrivate = true,
 }: apiProcessorParams) => {
   try {
     let response = await axios({
       method,
       url,
       data,
-      headers: { Authorization: getAccessToken() },
+      headers: isPrivate ? { Authorization: getAccessToken() } : {},
     });
-    //response from backend expample: {status: "success", message: "Login successful", user}
     return response.data;
   } catch (error) {
     console.log(error);

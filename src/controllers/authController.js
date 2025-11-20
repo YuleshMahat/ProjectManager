@@ -59,6 +59,7 @@ export async function loginUser(req) {
     };
 
     const accessToken = createAccessToken(payload);
+    console.log(accessToken);
     const refreshToken = createRefreshToken(payload);
     return NextResponse.json(
       {
