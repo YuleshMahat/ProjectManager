@@ -4,7 +4,7 @@ import { apiProcessor, apiUrl } from "@/utils-fe/apiProcessor";
 export interface ProjectForm {
   userId: string;
   name: string;
-  image: string;
+  image?: string;
   skills?: string[];
   github: string;
   live: string;

@@ -1,11 +1,12 @@
 // src/components/AddProjectModal.tsx
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, ReactEventHandler } from "react";
 import { Modal, Button, Form, Image, Badge } from "react-bootstrap";
 import { Plus, X, Upload, Github, Link45deg } from "react-bootstrap-icons";
 import { addProjectAction } from "@/features/projects/projectsAction";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
+import useForm from "@/hooks/useForm";
 
 interface AddProjectModalProps {
   show: boolean;
@@ -23,25 +24,29 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
 
   const [saving, setSaving] = useState(false);
   const [imagePreview, setImagePreview] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [skillsInput, setSkillsInput] = useState("");
 
-  // FORM STATE — 1:1 with your Mongoose schema
-  const [formData, setFormData] = useState({
+  const initialData = {
     name: "",
     image: "",
+    imageFile: null,
     skills: [] as string[],
     github: "",
     live: "",
     featured: false,
     order: 0,
-  });
+  };
+
+  const { form, setForm } = useForm(initialData);
 
   // Reset form when modal opens
   useEffect(() => {
     if (show) {
-      setFormData({
+      setForm({
         name: "",
         image: "",
+        imageFile: null,
         skills: [],
         github: "",
         live: "",
@@ -58,52 +63,60 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
     if (e.key === "Enter" && skillsInput.trim()) {
       e.preventDefault();
       const skill = skillsInput.trim();
-      if (!formData.skills.includes(skill)) {
-        setFormData((prev) => ({ ...prev, skills: [...prev.skills, skill] }));
+      if (!form.skills.includes(skill)) {
+        setForm((prev) => ({ ...prev, skills: [...prev.skills, skill] }));
       }
       setSkillsInput("");
     }
   };
 
   const removeSkill = (skill: string) => {
-    setFormData((prev) => ({
+    setForm((prev) => ({
       ...prev,
       skills: prev.skills.filter((s) => s !== skill),
     }));
   };
 
   const handleImageChange = (url: string) => {
-    setFormData((prev) => ({ ...prev, image: url }));
+    setForm((prev) => ({ ...prev, image: url }));
     setImagePreview(url);
   };
 
+  const handleImageUploadChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const imageUrl = URL.createObjectURL(file);
+    setImagePreview(imageUrl);
+    setImageFile(file);
+  };
+
   const handleSubmit = async () => {
-    if (
-      !formData.name ||
-      !formData.image ||
-      !formData.github ||
-      !formData.live
-    ) {
+    if (!form.name || !form.image || !form.github || !form.live) {
       return;
     }
 
     setSaving(true);
 
     try {
-      // THIS WORKS NO MATTER WHAT addProjectAction RETURNS
+      const formData = new FormData(); //form data variable to send the data as form data to the backend instead of usual URL encoded data.
+
+      for (const key in form) {
+        formData.append(key, form[key]);
+      }
+
+      formData.append("imageFile", imageFile);
+
       const actionResult = dispatch(
         addProjectAction({
           userId: user!._id,
-          ...formData,
-        })
+        }, formData);
       );
 
-      // If it's a thunk, wait for it
       if (actionResult && typeof (actionResult as any).then === "function") {
         await actionResult;
       }
 
-      // SUCCESS!
       onSuccess?.();
       onHide();
     } catch (err: any) {
@@ -131,10 +144,8 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
             <Form.Control
               type="text"
               placeholder="My Awesome App"
-              value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
               autoFocus
             />
           </Form.Group>
@@ -147,14 +158,30 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
             <Form.Control
               type="url"
               placeholder="https://..."
-              value={formData.image}
+              value={form.image}
               onChange={(e) => handleImageChange(e.target.value)}
             />
             {imagePreview && (
               <div className="mt-3 rounded overflow-hidden shadow-sm">
-                <Image src={imagePreview} alt="Preview" fluid rounded />
+                <Image
+                  src={imagePreview}
+                  alt="Preview"
+                  fluid
+                  rounded
+                  style={{ maxWidth: "200px", objectFit: "contain" }}
+                />
               </div>
             )}
+          </Form.Group>
+
+          {/*  Image upload feature  */}
+          <Form.Group controlId="formFile" className="mb-3">
+            <Form.Label>Upload project image</Form.Label>
+            <Form.Control
+              type="file"
+              accept="image/*"
+              onChange={handleImageUploadChange}
+            />
           </Form.Group>
 
           {/* URLs */}
@@ -166,10 +193,8 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
               <Form.Control
                 type="url"
                 placeholder="https://github.com/username/repo"
-                value={formData.github}
-                onChange={(e) =>
-                  setFormData({ ...formData, github: e.target.value })
-                }
+                value={form.github}
+                onChange={(e) => setForm({ ...form, github: e.target.value })}
               />
             </Form.Group>
 
@@ -180,10 +205,8 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
               <Form.Control
                 type="url"
                 placeholder="https://myapp.vercel.app"
-                value={formData.live}
-                onChange={(e) =>
-                  setFormData({ ...formData, live: e.target.value })
-                }
+                value={form.live}
+                onChange={(e) => setForm({ ...form, live: e.target.value })}
               />
             </Form.Group>
           </div>
@@ -201,7 +224,7 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
               onKeyDown={addSkill}
             />
             <div className="mt-3">
-              {formData.skills.map((skill) => (
+              {form.skills.map((skill) => (
                 <Badge
                   key={skill}
                   bg="info"
@@ -224,10 +247,8 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
             <Form.Check
               type="checkbox"
               label="Pin as Featured Project (appears first)"
-              checked={formData.featured}
-              onChange={(e) =>
-                setFormData({ ...formData, featured: e.target.checked })
-              }
+              checked={form.featured}
+              onChange={(e) => setForm({ ...form, featured: e.target.checked })}
             />
           </Form.Group>
         </Form>
@@ -242,11 +263,7 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
           size="lg"
           onClick={handleSubmit}
           disabled={
-            saving ||
-            !formData.name ||
-            !formData.image ||
-            !formData.github ||
-            !formData.live
+            saving || !form.name || !form.image || !form.github || !form.live
           }
         >
           {saving ? (

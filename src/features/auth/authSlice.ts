@@ -13,10 +13,12 @@ export interface User {
 
 interface UserState {
   user: User | null;
+  loading: boolean;
 }
 
 const initialState: UserState = {
   user: null,
+  loading: true,
 };
 
 const userSlice = createSlice({
@@ -33,8 +35,11 @@ const userSlice = createSlice({
       localStorage.removeItem("token");
       sessionStorage.clear();
     },
+    setLoading: (state, action) => {
+      state.loading = action.payload;
+    },
   },
 });
 
-export const { setUser, logout } = userSlice.actions;
+export const { setUser, logout, setLoading } = userSlice.actions;
 export default userSlice.reducer;

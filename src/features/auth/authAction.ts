@@ -1,6 +1,6 @@
 import { toast } from "react-toastify";
 import { fetchCustomerDetailApi, loginApi } from "./authApi";
-import { logout, setUser } from "./authSlice";
+import { logout, setLoading, setUser } from "./authSlice";
 import {
   storeAccessToken,
   storeRefreshToken,
@@ -26,12 +26,14 @@ export const handleLoginAction = (form: Form) => async (dispatch) => {
   return result;
 };
 
-export const getCustomerDetail = () => async (dispatch) => {
+export const getCustomerDetail = () => async (dispatch: any) => {
   try {
     const data = await fetchCustomerDetailApi();
 
     if (data.status === "success") {
       dispatch(setUser(data.customer));
+      dispatch(setLoading(false));
+      return data;
     } else {
       dispatch(setUser(null));
     }
@@ -42,4 +44,5 @@ export const getCustomerDetail = () => async (dispatch) => {
 
 export const handleLogout = () => (dispatch) => {
   dispatch(logout());
+  dispatch(setLoading(false));
 };

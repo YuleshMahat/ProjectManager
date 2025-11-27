@@ -1,20 +1,30 @@
+import { mongooseConnect } from "@/lib/config/mongoConfig";
+import { requireAuth } from "@/lib/utils/auth";
 import { NextRequest, NextResponse } from "next/server";
 
 export const getUserDetails = async (req: NextRequest) => {
-  const userHeader = req.headers.get("x-user");
-  console.log(userHeader);
-  if (!userHeader) {
+  try {
+    await mongooseConnect();
+    const user = await requireAuth(req);
+    if (user) {
+      return NextResponse.json(
+        {
+          status: "success",
+          message: "User details fetched successfully",
+          customer: user,
+        },
+        { status: 200 }
+      );
+    } else
+      return NextResponse.json(
+        { status: "error", message: "Error fetching user details" },
+        { status: 500 }
+      );
+  } catch (error: any) {
+    console.log(error?.message);
     return NextResponse.json(
-      { status: "error", message: "User not found!" },
-      { status: 404 }
+      { status: "error", message: "Internal Server error" },
+      { status: 500 }
     );
   }
-
-  const user = JSON.parse(userHeader);
-
-  return NextResponse.json({
-    status: "success",
-    message: "User details fetched successfully",
-    user,
-  });
 };

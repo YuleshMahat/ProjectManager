@@ -15,7 +15,6 @@ const Nav = () => {
 
   const onLogout = () => {
     dispatch(handleLogout());
-    toast.success("See ya, legend! You're logged out.");
   };
 
   const goHome = () => {

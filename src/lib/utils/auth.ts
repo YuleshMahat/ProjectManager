@@ -16,9 +16,9 @@ export async function requireAuth(req: Request) {
     if (!user) {
       return { message: "Unauthorized", status: 401 };
     }
-
-    delete user.password;
-    return { user };
+    user.password = "";
+    console.log(user);
+    return user;
   } catch (err: any) {
     console.log(err.message);
     return { message: err.message ?? "Unauthorized", status: 401 };

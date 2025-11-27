@@ -6,19 +6,25 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import { getCustomerDetail } from "@/features/auth/authAction";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const { user } = useAppSelector((state) => state.userStore);
+  const dispatch = useAppDispatch();
+  const { user, loading } = useAppSelector((state) => state.userStore);
 
   useEffect(() => {
-    if (!user?._id) {
-      toast.info("Please log in to continue");
-      router.replace("/");
+    dispatch(getCustomerDetail());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (!loading) {
+      if (!user?._id) {
+        toast.info("Please log in to continue");
+        router.replace("/");
+      }
     }
   }, [user]);
-
-  if (!user?._id) return null;
 
   return (
     <div className="dashboard-layout d-flex flex-column p-3 min-vh-100">
