@@ -1,6 +1,6 @@
 import { mongooseConnect } from "@/lib/config/mongoConfig";
 import { requireAuth } from "@/lib/utils/auth";
-import { extractImage } from "@/lib/utils/imageHelper";
+import { extractImage, uploadImage } from "@/lib/utils/imageHelper";
 import { parseJSON } from "@/lib/utils/parseJson";
 import {
   createProject,
@@ -30,19 +30,22 @@ export const addNewProject = async (req: NextRequest) => {
       featured = false,
     } = body;
 
-    if (image) console.log(body);
     console.log(file);
+    const uploadedImagePath = await uploadImage(file);
 
-    return;
-    // 4. Basic validation
-    if (!name || !image || !github || !live) {
+    if (!uploadedImagePath)
       return NextResponse.json(
-        { error: "Missing required fields: name, image, github, live" },
+        { status: "error", message: "Error uploading image" },
+        { status: 500 }
+      );
+
+    if (!name || !github || !live) {
+      return NextResponse.json(
+        { error: "Missing required fields: name, github, live" },
         { status: 400 }
       );
     }
 
-    // 5. Create project via your controller
     const project = await createProject({
       userId: user._id,
       name: name.trim(),
@@ -55,6 +58,7 @@ export const addNewProject = async (req: NextRequest) => {
       order: 0, // will be reordered later if needed
     });
 
+    return;
     // 6. Success response
     return NextResponse.json(
       {
