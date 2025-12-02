@@ -79,7 +79,6 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
   const handleSubmit = async () => {
     const result = dispatch(
       updateProjectAction(form._id, {
-        userId: user._id,
         name: form.name,
         image: form.image,
         skills: form.skills,
