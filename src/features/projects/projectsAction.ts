@@ -28,56 +28,33 @@ interface ApiResponse<T = any> {
 // Fetch all projects for a user
 export const fetchProjectsAction =
   (userId: string) => async (dispatch: AppDispatch) => {
-    try {
-      dispatch(setLoading(true));
+    dispatch(setLoading(true));
 
-      const result = await getProjectApi(userId);
+    const result = await getProjectApi(userId);
 
-      // THIS IS THE KEY FIX
-      let projects: Project[] = [];
+    let projects: Project[] = [];
 
-      if (result.status === "success") {
-        // Handle both cases: result.projects OR result.data?.projects
-        const rawProjects = result.projects || result.data?.projects || [];
-
-        // Flatten just in case it's double-wrapped (Project[][])
-        projects = Array.isArray(rawProjects)
-          ? rawProjects.flat() // ← This removes Project[][] → Project[]
-          : [];
-
-        dispatch(setProjects(projects));
-        toast.success(`Loaded ${projects.length} project(s)`);
-      } else {
-        toast.error(result.message || "Failed to load projects");
-        dispatch(setProjects([]));
-      }
-    } catch (error: any) {
-      toast.error("Network error. Please check your connection.");
-      console.error("Fetch Projects Error:", error);
+    if (result.status === "success") {
+      projects = result.data;
+      dispatch(setProjects(projects));
+    } else {
       dispatch(setProjects([]));
-    } finally {
-      dispatch(setLoading(false));
     }
+    setLoading(false);
   };
 
 // Add a new project
 export const addProjectAction =
   (form: FormData) => async (dispatch: AppDispatch) => {
-    try {
-      const result: ApiResponse<Project> = await addProjectApi(form);
+    const result: ApiResponse<Project> = await addProjectApi(form);
 
-      if (result.status === "success") {
-        dispatch(addProject(result.project!));
-        toast.success("Project added successfully!");
-        return result;
-      } else {
-        toast.error(result.message || "Failed to add project");
-        return result;
-      }
-    } catch (error: any) {
-      toast.error("Something went wrong. Please try again.");
-      console.error("Add Project Error:", error);
-      throw error;
+    if (result.status === "success") {
+      dispatch(addProject(result.project!));
+      toast.success("Project added successfully!");
+      return result;
+    } else {
+      toast.error(result.message || "Failed to add project");
+      return result;
     }
   };
 

@@ -30,7 +30,6 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
   const initialData = {
     name: "",
     image: "",
-    imageFile: null,
     skills: [] as string[],
     github: "",
     live: "",
@@ -43,18 +42,10 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
   // Reset form when modal opens
   useEffect(() => {
     if (show) {
-      setForm({
-        name: "",
-        image: "",
-        imageFile: null,
-        skills: [],
-        github: "",
-        live: "",
-        featured: false,
-        order: 0,
-      });
+      setForm(initialData);
       setSkillsInput("");
       setImagePreview("");
+      setImageFile(null);
     }
   }, [show]);
 
@@ -104,15 +95,11 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
       for (const key in form) {
         formData.append(key, form[key]);
       }
-
       formData.append("imageFile", imageFile);
 
-      const actionResult = dispatch(addProjectAction(formData));
+      const actionResult = await dispatch(addProjectAction(formData));
 
-      if (actionResult && typeof (actionResult as any).then === "function") {
-        await actionResult;
-      }
-
+      if (actionResult.status === "success") setImageFile(null);
       onSuccess?.();
       onHide();
     } catch (err: any) {

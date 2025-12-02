@@ -12,32 +12,31 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const addNewProject = async (req: NextRequest) => {
   try {
-    // 2. Connect DB
     await mongooseConnect();
 
-    // 3. Parse body
     const user = await requireAuth(req);
 
     const { file, body } = await extractImage(req);
 
-    const {
-      name,
-      image,
-      skills = [],
-      github,
-      live,
-      description,
-      featured = false,
-    } = body;
+    const { name, image, skills, github, live, description, featured } = body;
+    console.log(body);
 
-    console.log(file);
-    const uploadedImagePath = await uploadImage(file);
+    let imageUrl = "";
 
-    if (!uploadedImagePath)
-      return NextResponse.json(
-        { status: "error", message: "Error uploading image" },
-        { status: 500 }
-      );
+    if (!file) {
+      console.log("file is null");
+      imageUrl = image;
+    } else {
+      console.log("Inside if block of file and file is", file);
+      const uploadedImagePath = await uploadImage(file);
+
+      if (!uploadedImagePath)
+        return NextResponse.json(
+          { status: "error", message: "Error uploading image" },
+          { status: 500 }
+        );
+      imageUrl = uploadedImagePath;
+    }
 
     if (!name || !github || !live) {
       return NextResponse.json(
@@ -46,32 +45,33 @@ export const addNewProject = async (req: NextRequest) => {
       );
     }
 
+    console.log("image URL", imageUrl);
+
     const project = await createProject({
       userId: user._id,
       name: name.trim(),
-      image,
+      image: imageUrl,
       skills,
       github: github.trim(),
       live: live.trim(),
       description: description?.trim(),
       featured,
-      order: 0, // will be reordered later if needed
+      order: 0,
     });
 
-    return;
-    // 6. Success response
     return NextResponse.json(
       {
+        status: "success",
         message: "Project added successfully!",
-        project,
       },
       { status: 201 }
     );
   } catch (error: any) {
-    console.error("Add Project Error:", error);
+    console.log("Add Project Error:", error.message);
     return NextResponse.json(
       {
-        error: error.message || "Failed to add project",
+        status: "error",
+        message: "Internal server error",
       },
       { status: 500 }
     );
@@ -82,26 +82,18 @@ export const getProjects = async (id: string) => {
   try {
     // 1. Connect DB
     await mongooseConnect();
-
-    // 2. Parse body (you pass userId here from frontend)
-    // 3. Validate userId
     if (!id) {
       return NextResponse.json(
         { error: "userId is required" },
         { status: 400 }
       );
     }
-
-    // 4. Fetch projects using your existing controller
-    // Assuming you have this in your projectsModel:
-    // import { getUserProjects } from "@/models/projects/projectsModel";
     const projects = await getUserProjects(id);
 
-    // 5. Success
     return NextResponse.json(
       {
         message: "Projects fetched successfully",
-        projects,
+        data: projects,
         count: projects.length,
         status: "success",
       },

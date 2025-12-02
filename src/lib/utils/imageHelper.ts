@@ -1,14 +1,40 @@
 import { v2 as cloudinary } from "cloudinary";
 import config from "../config/config";
 
-export const extractImage = async (req: Request) => {
+interface ProjectBody {
+  name: string;
+  image?: string;
+  skills: string;
+  github: string;
+  live: string;
+  description: string;
+  featured: string;
+}
+
+export const extractImage = async (
+  req: Request
+): Promise<{ file: File | null; body: ProjectBody }> => {
   const formData = await req.formData();
 
   const entries = Object.fromEntries(formData.entries());
-  const file = entries.imageFile as File;
+  let file = entries.imageFile as File | null;
+
+  console.log(file);
   delete entries.imageFile;
 
-  return { file, body: entries };
+  const body: ProjectBody = {
+    name: String(entries.name),
+    image: String(entries.image || ""),
+    skills: String(entries.skills || ""),
+    github: String(entries.github || ""),
+    live: String(entries.live || ""),
+    description: String(entries.description || ""),
+    featured: String(entries.featured || ""),
+  };
+  if (typeof file === "string") {
+    file = null;
+  }
+  return { file, body };
 };
 
 export const uploadImage = async (file: File) => {
@@ -21,17 +47,19 @@ export const uploadImage = async (file: File) => {
   });
 
   try {
-    const result = await new Promise((resolve, reject) => {
-      const stream = cloudinary.uploader.upload_stream(
-        { folder: "portfolioManager" },
-        (error, uploaded) => {
-          if (error) reject(error);
-          else resolve(uploaded);
-        }
-      );
-      stream.end(buffer);
-    });
-    console.log(result);
+    const result = await new Promise<{ secure_url: string }>(
+      (resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: "portfolioManager" },
+          (error, uploaded) => {
+            if (error) reject(error);
+            else resolve(uploaded);
+          }
+        );
+        stream.end(buffer);
+      }
+    );
+    return result.secure_url;
   } catch (error) {
     console.log(error);
     return null;
